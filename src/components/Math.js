@@ -7,12 +7,12 @@ export function Math1(){
   const parsedVersion = parseMath(mathValue, separateTerms);
   const canvasRef = useRef(null);
   //console.log(canvasRef)
-  const myTree = new Tree();
+  /*const myTree = new Tree();
   const myNode = new Node(0);
   myTree.root = myNode;
-  const nodes = [myNode.add(1), myNode.add(2), myNode.add(3), myNode.add(4), myNode.add(5)];
+  const nodes = [myNode.add(1), myNode.add(2), myNode.add(3), myNode.add(4), myNode.add(5)];*/
  // console.log(nodes)
-  for(const i of nodes){
+  /*for(const i of nodes){
     const x = [i.add(1),i.add(2),i.add(3),i.add(4),i.add(5)];
     for(const l of x){
       l.add(1)
@@ -21,7 +21,7 @@ export function Math1(){
     }
     
     
-  }
+  }*/
   //const visualized = myTree.visualize(canvasRef);
  
   return(
@@ -35,29 +35,28 @@ export function Math1(){
    
       </div>
     </div>
-    <canvas ref={canvasRef} width={1000} height={1000} onChange={()=>{myTree.visualize(canvasRef)}}></canvas>
+    <canvas ref={canvasRef} width={1000} height={1000} onChange={()=>{}}></canvas>
     </>
   )
 }
 
 function parseMath(input1, parentTree){
+  // Creates a tree which contains all of the "terms" of the expression added together
+  // Each term is its own "tree" which contains its factors
+  // Ideally, the deepest parts of the tree will be the parts of the expression the user sees
+  // WIP 
   let input = input1;
   if(input==null){
     return parentTree;
   }
-
-  input = input.replaceAll(/\s/g,"");
+  // cleans up the input
+  input = input.replaceAll(/\s/g,""); 
   input = input.replaceAll(/(?<![-+/*])\(/g, "\* \(");
-  
-  // ok so we're breaking it down into trees huh
-  // one tree for multiplication
-  
-
   const parenthesesMatches = [...input.matchAll(/\((.*)\)/g)];
-  let myArray  = [];
+  let parenthesesArray  = [];
   if(parenthesesMatches.length>=1){
     let i = 0;
-    myArray = parenthesesMatches.map((val)=>{
+    parenthesesArray = parenthesesMatches.map((val)=>{
       input = input.replace(val[0],"replaced" + i);
       i = i+1;
       const parenthesesTree = new Tree();
@@ -66,14 +65,11 @@ function parseMath(input1, parentTree){
       return (val.length>1?parseMath(val[1]):null, parenthesesTree);
     })
   }
-
-  
   const exponentMatches = [...input.matchAll(/([A-z0-9]*?)\^([0-9A-z]+)/g)];
-  let myResult = [];
+  let exponentArray = [];
   if(exponentMatches.length>=1){
     let i = 0;
     exponentMatches.map((val) => {
-
       if(val.length>2){
         const parenthesesReplacedMatches = [...val[0].matchAll(/(?<=replaced)([0-9]+)/g)]
         const myTreeOrder = [val[1], val[2]];
@@ -81,138 +77,97 @@ function parseMath(input1, parentTree){
           for(let i = 1; i< parenthesesReplacedMatches.length; i++){
             const replacedValue = parenthesesReplacedMatches[i];
             const d = parseInt(replacedValue);
-            myTreeOrder[i] = myArray[i];
+            myTreeOrder[i] = parenthesesArray[i];
 
           }}
         const newNode = new Node({base: myTreeOrder[0], exponent: myTreeOrder[1]});
-        myResult[i] = newNode;
+        exponentArray[i] = newNode;
         i++;
         input = input.replace(val[0],"exponent" + i);
         return null;
-
-        if(val[1].match(/replaced[0-9]+/g)!=null){ 
-
-          // doesn't have support for parenthesis in the exponent
-          const d = parseInt(val[1].match(/[0-9]+/g)[0]);
-        //  const firstHalfOfArraySplit = myArray.slice(0, d);
-       //   const secondHalfOfArraySplit = myArray.slice(d, myArray.length);
-          const myExponent = <span className="exponent--power">{val[2]}</span>
-          myArray[d] = <>{myArray[d]}{myExponent}</>
-
-          //myArray=firstHalfOfArraySplit.concat(myExponent, secondHalfOfArraySplit);
-        } else {
-          input = input.replace(val[0],"exponent" + i);
-          //const firstHalfOfArraySplit = myArray.slice(0, i);
-         // const secondHalfOfArraySplit = myArray.slice(i, myArray.length);
-          const myExponent = <><span className="exponent--base">{val[1]}</span><span className="exponent--power">{val[2]}</span></>
-          myResult[i] = myExponent;
-          i = i + 1;
-          //myArray=firstHalfOfArraySplit.concat(myExponent, secondHalfOfArraySplit);
-        }
         
       }
     })
   }
 
-  ///
-  const myTerms = [];
+  /// Multiplication and Dvision
+  const multDivArray = [];
   const multiplicationDivisionMatches = [...input.matchAll(/([A-z0-9]+)([\*\/])([a-z0-9]+)*?/g)];
-  //console.log(input)
   if(multiplicationDivisionMatches.length >= 1){
-   // console.log('yessss');
     let i = 0;
       multiplicationDivisionMatches.map((val)=>{
-        console.log(val)
         if(val.length>=4){
-          console.log(val[3])
-          const stringVal3 = val[3]
-          const parenthesesReplacedMatches = [...val[0].matchAll(/(replaced|exponent)([0-9]+)/g)]
-          
+          const alreadyChecked = [...val[0].matchAll(/(replaced|exponent)([0-9]+)/g)]
+          // Finds all o the matches that have been checked
+          // This way, if there's a factor that's in parentheses/has an exponent
+          // it is still added to the tree
+          //TODO: The factors in parenthesis are added to the tree twice
+          // because they are added in the multiplication division matches AND
+          // the alreadyChecked
           const multTree = new Tree();
           const multNode = new Node(val);
           multTree.root = multNode;
-          let dontUse = [];
-          if(parenthesesReplacedMatches.length>0)  {
-            let j = 0;
-          
-            for(let m in parenthesesReplacedMatches){
-              for(let k = 2; k< m.length; k++){
-                const replacedValue = m[k];
-                const d = parseInt(replacedValue);
-                switch (m[1]){
-                  case "replaced":
-                    multNode.add(myArray[d]);
-                  case "exponent":
-                    multNode.add(myResult[d]);
-                }
-                j++;
-              //  myTreeOrder[k] = parenthesesMatches;
+          if(alreadyChecked.length>0)  {
+            for(let m in alreadyChecked){ // obviously all the already parsed
+             // for(let k = 2; k< m.length; k++){ // checks  both the word and the number  
+              const replacedValue = m[2];
+              const d = parseInt(replacedValue);
+              switch (m[1]){
+                case "replaced":
+                  multNode.add(parenthesesArray[d]);
+                case "exponent":
+                  multNode.add(exponentArray[d]);
               }
-              j++;
+            //  }
             }
           }
           for(let j = 0; j< val.length; j++){
               multNode.add(new Node(val[j]));
           }
-          myTerms[i] = multTree;
-       /* const newNode = new Node({base: myTreeOrder[0], exponent: myTreeOrder[1]});
-        myTerms[i] = newNode;*/
+          multDivArray[i] = multTree;
           input = input.replace(val[0],"mult" + i);
           i++;
-          
-
-        // revision
         return null;
-
-          return null;
-          // deprecated
-          if(stringVal3.match(/replaced[0-9]+/g)){
-            const myIndex = parseInt(stringVal3.match(/[0-9]*/g));
-            const myBestie = myArray[myIndex];
-            const myNewVersion = <><span>{val[3]}</span><span>{val[2]}</span>{myBestie}</>
-            myArray[myIndex] = myNewVersion;
-          } else if(stringVal3.match(/exponent[0-9]+/g)){
-            const myIndex = parseInt(stringVal3.match(/[0-9]/g)[0]);
-            const myBestie = myResult[myIndex];
-            myResult[myIndex] = <><span className="term">{val[1]}</span><span>{val[2]}</span>{myBestie}</>
-
-          } else{
-            input = input.replace(val[0], val[2]==="*"?"mult":"div" + i);
-            myTerms[i] = <><span className="term">{val[1]}</span><span>{val[2]}</span><span className="term">{val[3]}</span></>
-
-            i+=1;
-          }
-
         }
-        /**/
       })
   }
+// doing this again
+  const alreadyChecked = [input.matchAll(/(replaced|exponent|mult)([0-9]+)/g)]
+  if(alreadyChecked.length>0){
+    for(let m in alreadyChecked){
+      switch(m[1]){
+        case "replaced":
+          parentTree.root.add(parenthesesArray[m[2]])
+          break;
+        case "exponent":
+          parentTree.root.add(exponentArray[m[2]])
+          break;
+        case "mult":
+          parentTree.root.add(multDivArray[m[2]])
+          break;
+      }
+      input = input.replace(m[0], "");
+    }
+  }
+  input = input.replaceAll(/(?<=[+-/*])[+-/*]/g, "").replaceAll(/[+-/*](?=[+-/*])/g,"");
+  console.log(input)
+  
+  // todo: Should fix subtraction and division
 
 
   const additionSubtractionMatches = [...input.matchAll(/([A-z0-9]*?)([\+\-])([0-9A-z]+)/g)];
-  input =input.replace(/(replaced|exponent|mult|div)([0-9])?/g, "");
-  console.log(input)
-  let firstTermExists = input.match(/.*/g);
-  let constantsAndExes = [...input.matchAll(/[-0-9A-z]+/g)];
-  console.log(constantsAndExes)
-  let finalResult = [];
-  finalResult = constantsAndExes.map((constant) => {
-    console.log(constant[0])
-    return(<span className="term">{constant[0]}</span>)
+  additionSubtractionMatches.map((match) =>{
+    parentTree.root.add(match[1]);
+    const integerValue = parseInt(match[2]=="-"?"-"+match[3].match(/[0-9]+/g)[1]:match[3]);
+    parentTree.root.add(match[3]);
   })
-
-  console.log(firstTermExists)
   
   
 
-  finalResult = finalResult.concat(myArray, myResult, myTerms);
-  finalResult= finalResult.map((thing) =>{
-    parentTree.root.add(thing);
-
-  })
+  //finalResult = finalResult.concat(parenthesesArray, exponentArray, multDivArray);
   //finalResult[finalResult.length] = <>{input}</>
-  console.log(finalResult)
-  console.log(myResult)
+  //console.log(finalResult)
+  console.log(exponentArray)
 
   return parentTree;
 }
