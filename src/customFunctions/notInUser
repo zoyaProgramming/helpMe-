@@ -1,0 +1,96 @@
+multiplicationDivisionMatches.map((val)=>{
+        console.log(val)
+        if(val.length>=4){
+          console.log(val[3])
+          const stringVal3 = val[3]
+          if(stringVal3.match(/replaced[0-9]+/g)){
+            const myIndex = parseInt(stringVal3.match(/[0-9]*/g));
+            const myBestie = myArray[myIndex];
+            const myNewVersion = <><span>{val[3]}</span><span>{val[2]}</span>{myBestie}</>
+            myArray[myIndex] = myNewVersion;
+          } else if(stringVal3.match(/exponent[0-9]+/g)){
+            const myIndex = parseInt(stringVal3.match(/[0-9]/g)[0]);
+            const myBestie = myResult[myIndex];
+            myResult[myIndex] = <><span className="term">{val[1]}</span><span>{val[2]}</span>{myBestie}</>
+          } else{
+            input = input.replace(val[0], val[2]==="*"?"mult":"div" + i);
+            myTerms[i] = <><span className="term">{val[1]}</span><span>{val[2]}</span><span className="term">{val[3]}</span></>
+
+            i+=1;
+          }
+
+        }
+        /**/
+      })
+
+
+      if(additionSubtractionMatches.length > 1){
+        let i = 0;
+        additionSubtractionMatches.map((val)=>{
+          console.log('addddiisdjfai;')
+          let firstTermExists = val[1].match(/(replaced|exponent|mult|div)([0-9])+/g);
+          let secondTermExists = val[3].match(/(replaced|exponent|mult|div)([0-9])+/g);
+          firstTermExists=firstTermExists[0]!=null?firstTermExists:false;
+          secondTermExists=secondTermExists[0]!=null?secondTermExists:false;
+    
+    // note : if they're all different terms, why don't we just look for ones that aren't covered?
+          if(val[3].match(/replaced[0-9]+/g)){
+            const myIndex = parseInt(val[3].match(/[0-9]*/g)[0]);
+            const myBestie = myArray[myIndex];
+            const myNewVersion = <><span className="term">{val[3]}</span><span className="term">{val[2]}</span>{myBestie}</>
+            myArray[myIndex] = myNewVersion;
+          } else if(val[3].match(/exponent[0-9]/)){
+            console.log('yesssss')
+            const myIndex = parseInt(val[3].match(/[0-9]*/g)[0]);
+            const myBestie = myResult[myIndex];
+            myResult[myIndex] = <><span className="term"></span>{val[1]}<span>{val[2]}</span>{myBestie}</>
+          } else if(val[3].match(/mult|div/s)){
+            console.log(" uhwaerpoifdajiofdaejiod")
+            const myIndex = parseInt(val[3].match(/[0-9]*/g)[0]);
+            const myBestie = myTerms[myIndex];
+            myTerms[myIndex] = <><span className="term"></span>{val[1]}<span>{val[2]}</span>{myBestie}</>
+          }
+          else{
+            console.log('nooooo')
+            input = input.replace(val[0], val[2]==="+"?"add":"sub" + i);
+            finalResult[i] = <><span className="term"></span>val[1]<span>{val[2]}</span><span className="term">{val[3]}</span></>
+            i+=1;
+          }
+        })
+      }
+
+
+      if(additionSubtractionMatches.length > 1){
+        let i = 0;
+        additionSubtractionMatches.map((val)=>{
+          console.log('addddiisdjfai;')
+          let firstTermExists = val[1].match(/(replaced|exponent|mult|div)([0-9])+/g);
+          let secondTermExists = val[3].match(/(replaced|exponent|mult|div)([0-9])+/g);
+          firstTermExists=firstTermExists[0]!=null?firstTermExists:false;
+          secondTermExists=secondTermExists[0]!=null?secondTermExists:false;
+    
+    // note : if they're all different terms, why don't we just look for ones that aren't covered?
+          if(val[3].match(/replaced[0-9]+/g)){
+            const myIndex = parseInt(val[3].match(/[0-9]*/g)[0]);
+            const myBestie = myArray[myIndex];
+            const myNewVersion = <><span className="term">{val[3]}</span><span className="term">{val[2]}</span>{myBestie}</>
+            myArray[myIndex] = myNewVersion;
+          } else if(val[3].match(/exponent[0-9]/)){
+            console.log('yesssss')
+            const myIndex = parseInt(val[3].match(/[0-9]*/g)[0]);
+            const myBestie = myResult[myIndex];
+            myResult[myIndex] = <><span className="term"></span>{val[1]}<span>{val[2]}</span>{myBestie}</>
+          } else if(val[3].match(/mult|div/s)){
+            console.log(" uhwaerpoifdajiofdaejiod")
+            const myIndex = parseInt(val[3].match(/[0-9]*/g)[0]);
+            const myBestie = myTerms[myIndex];
+            myTerms[myIndex] = <><span className="term"></span>{val[1]}<span>{val[2]}</span>{myBestie}</>
+          }
+          else{
+            console.log('nooooo')
+            input = input.replace(val[0], val[2]==="+"?"add":"sub" + i);
+            finalResult[i] = <><span className="term"></span>val[1]<span>{val[2]}</span><span className="term">{val[3]}</span></>
+            i+=1;
+          }
+        })
+      }

@@ -1,0 +1,15 @@
+
+.exponent--base{
+  color: red;
+  font-size: 5vh;
+
+}
+.exponent--power{
+  color: blue;
+  align-self: flex-start;
+  font-size: 3vh;
+}
+.term{
+  color: green;
+  font-size: 5vh;
+}
