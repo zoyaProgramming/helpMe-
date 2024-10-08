@@ -22,17 +22,17 @@ export function Math1(){
     
     
   }
-  const visualized = myTree.visualize(canvasRef);
+  //const visualized = myTree.visualize(canvasRef);
  
   return(
     <>
-    <button onClick = {() => {myTree.visualize(canvasRef)}}> visula</button>
+    <button onClick = {() => {parsedVersion.visualize(canvasRef)}}> visula</button>
     <div>
       <input onChange={(event)=>{
         setMathValue(event.target.value);
       }}></input>
       <div style={{display: "flex", flexDirection: "row", alignItems: "center"}}>
-      {parsedVersion}
+   
       </div>
     </div>
     <canvas ref={canvasRef} width={1000} height={1000} onChange={()=>{myTree.visualize(canvasRef)}}></canvas>
@@ -43,7 +43,7 @@ export function Math1(){
 function parseMath(input1, parentTree){
   let input = input1;
   if(input==null){
-    return "";
+    return parentTree;
   }
 
   input = input.replaceAll(/\s/g,"");
@@ -67,7 +67,6 @@ function parseMath(input1, parentTree){
     })
   }
 
-  return<p>{input}</p>
   
   const exponentMatches = [...input.matchAll(/([A-z0-9]*?)\^([0-9A-z]+)/g)];
   let myResult = [];
@@ -78,15 +77,17 @@ function parseMath(input1, parentTree){
       if(val.length>2){
         const parenthesesReplacedMatches = [...val[0].matchAll(/(?<=replaced)([0-9]+)/g)]
         const myTreeOrder = [val[1], val[2]];
-        for(let i = 0; i< parenthesesReplacedMatches.length; i++){
-          const replacedValue = parenthesesReplacedMatches[i];
-          const d = parseInt(replacedValue);
-          myTreeOrder[i] = replacedValue;
+        if(parenthesesReplacedMatches.length>0){
+          for(let i = 1; i< parenthesesReplacedMatches.length; i++){
+            const replacedValue = parenthesesReplacedMatches[i];
+            const d = parseInt(replacedValue);
+            myTreeOrder[i] = myArray[i];
 
-        }
+          }}
         const newNode = new Node({base: myTreeOrder[0], exponent: myTreeOrder[1]});
         myResult[i] = newNode;
         i++;
+        input = input.replace(val[0],"exponent" + i);
         return null;
 
         if(val[1].match(/replaced[0-9]+/g)!=null){ 
@@ -115,17 +116,56 @@ function parseMath(input1, parentTree){
 
   ///
   const myTerms = [];
-  const multiplicationDivisionMatches = [...input.matchAll(/([A-z0-9]+)([\*\/])([a-z0-9]+)/g)];
+  const multiplicationDivisionMatches = [...input.matchAll(/([A-z0-9]+)([\*\/])([a-z0-9]+)*?/g)];
   //console.log(input)
   if(multiplicationDivisionMatches.length >= 1){
    // console.log('yessss');
     let i = 0;
-  
       multiplicationDivisionMatches.map((val)=>{
         console.log(val)
         if(val.length>=4){
           console.log(val[3])
           const stringVal3 = val[3]
+          const parenthesesReplacedMatches = [...val[0].matchAll(/(replaced|exponent)([0-9]+)/g)]
+          
+          const multTree = new Tree();
+          const multNode = new Node(val);
+          multTree.root = multNode;
+          let dontUse = [];
+          if(parenthesesReplacedMatches.length>0)  {
+            let j = 0;
+          
+            for(let m in parenthesesReplacedMatches){
+              for(let k = 2; k< m.length; k++){
+                const replacedValue = m[k];
+                const d = parseInt(replacedValue);
+                switch (m[1]){
+                  case "replaced":
+                    multNode.add(myArray[d]);
+                  case "exponent":
+                    multNode.add(myResult[d]);
+                }
+                j++;
+              //  myTreeOrder[k] = parenthesesMatches;
+              }
+              j++;
+            }
+          }
+          for(let j = 0; j< val.length; j++){
+              multNode.add(new Node(val[j]));
+          }
+          myTerms[i] = multTree;
+       /* const newNode = new Node({base: myTreeOrder[0], exponent: myTreeOrder[1]});
+        myTerms[i] = newNode;*/
+          input = input.replace(val[0],"mult" + i);
+          i++;
+          
+
+        // revision
+        return null;
+
+          return null;
+          // deprecated
           if(stringVal3.match(/replaced[0-9]+/g)){
             const myIndex = parseInt(stringVal3.match(/[0-9]*/g));
             const myBestie = myArray[myIndex];
@@ -167,17 +207,14 @@ function parseMath(input1, parentTree){
 
   finalResult = finalResult.concat(myArray, myResult, myTerms);
   finalResult= finalResult.map((thing) =>{
-    return(
-    <>
-    {thing}
-    <span className="term">+</span>
-    </>)
+    parentTree.root.add(thing);
 
   })
   //finalResult[finalResult.length] = <>{input}</>
   console.log(finalResult)
   console.log(myResult)
-  return finalResult;
+
+  return parentTree;
 }
 
   
@@ -276,9 +313,6 @@ class Tree{
 
       ]
 
-
-      console.log(maxX)
-      console.log(prevMaxX)
       //let x1 = x%2==1?(x*50)-(x*50):(x*50)+(x*50);
 
 
@@ -289,7 +323,6 @@ class Tree{
          let x1 = (x-  Math.floor(maxX/2))*width;
 
          let firstY = (1 -Math.pow(2, (-1) * (y-1))) * height;
-         console.log(firstY)
          let secondY = firstY + Math.pow(2,(-1) * (y))*height;
     context.font = "14px sans-serif";
   
