@@ -197,7 +197,7 @@ function tokenize(input){
   return input;
 }
 
-
+// I love hot chips
 class Node{
   constructor(data){
     this.data = data;
