@@ -7,7 +7,7 @@ import { useReducer, useState } from 'react';
 import { Sidebar } from './reusable/components/Sidebar';
 import { fontReducer } from './customFunctions/fontReducer';
 import { useLocalStorage } from './customFunctions/useLocalStorage';
-import { Math } from './components/Math';
+import { Math1 } from './components/Math';
 
 function App() {
   const [fontOptions, setFontOptions] = useReducer( fontReducer, {fontName: 'Calibri', fontStyle: "", fontSize: '12px'});
@@ -22,7 +22,7 @@ function App() {
         <div style={{display: 'flex', flexDirection: 'column', height: '100vh', flexGrow: '1'}}>
           <Header selectedFolder={selectedFolder} fontOptions={fontOptions} setFontOptions={setFontOptions}></Header>
           <body>
-            {true?<Math></Math>:<MainDocument selectedFolder={selectedFolder} fontOptions={fontOptions} setFontOptions={setFontOptions}
+            {true?<Math1></Math1>:<MainDocument selectedFolder={selectedFolder} fontOptions={fontOptions} setFontOptions={setFontOptions}
             data = {data} dispatchData={dispatchData}
             ></MainDocument>}
           </body>
